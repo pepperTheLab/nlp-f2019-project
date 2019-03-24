@@ -15,7 +15,7 @@ df = preProcessing.characterRemover(df)
 df = preProcessing.tokenizer(df)
 df = preProcessing.stemAndLemma(df)
 df = preProcessing.stopwordsRemover(df)
-df = preProcessing.extractVectorMatrix(df)
+# df = preProcessing.extractVectorMatrix(df)
 
-#df.to_csv('processed.csv', index=False)
+df.to_csv('processed.csv', index=False)
 
