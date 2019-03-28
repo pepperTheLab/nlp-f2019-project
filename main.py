@@ -8,8 +8,9 @@ Created on Sun Mar 24 10:59:50 2019
 import loader
 import preProcessing
 
-PATH_TO_DATA = ''
+PATH_TO_DATA = 'Awards_data/'
 df = loader.loadData(PATH_TO_DATA)
+
 df = preProcessing.htmlTagRemover(df)
 df = preProcessing.characterRemover(df)
 df = preProcessing.tokenizer(df)

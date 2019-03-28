@@ -14,12 +14,27 @@ stem = loader.loadStem()
 lemma = loader.loadLemma()
 stop_words = loader.loadStopwords()
 
+def textWrapper(orig_func):
+    def wrapper(*args, **kwargs):
+        try:
+            return orig_func(*args, **kwargs)
+        except TypeError:
+            return empty()
+    
+    return wrapper
+            
+def empty():
+    return ''
+
+@textWrapper
 def htmlTagRemover(text):
     return re.sub(r'<.+>', '', text)
 
+@textWrapper
 def characterRemover(text):
     return re.sub(r'\W', ' ', text)
 
+@textWrapper
 def tokenizer(text):
     return word_tokenize(text)
 

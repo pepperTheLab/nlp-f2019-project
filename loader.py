@@ -17,10 +17,10 @@ def loadData(path):
     df = None
     for data in [file for file in os.listdir(path) if file[-4:]=='.csv']:
         df_batch = pd.read_csv(path + data, encoding='ISO-8859-1')
-        if df == None:
+        if df is None:
             df = df_batch
         else:
-            df = pd.concat([df, df_batch], axis=1)
+            df = pd.concat([df, df_batch])
     
     return df
 
