@@ -57,6 +57,10 @@ def extractVectorMatrix(df):
     matrix = vectorizer.fit_transform(extractDosuments(df)).todense()
     vectors = pd.DataFrame(matrix)
     vectors.columns = vocab
+    df.reset_index(inplace=True)
+    df.drop('index', axis=1, inplace=True)
+    vectors.reset_index(inplace=True)
+    vectors.drop('index', axis=1, inplace=True)
     df = pd.concat([df, vectors], axis=1)
     
     return df
