@@ -8,7 +8,7 @@ Created on Sun Mar 24 10:59:50 2019
 import loader
 import preProcessing
 
-PATH_TO_DATA = '/Users/xinning.w/Documents/GWU/SP_2019/NLP/Awards_data/'
+PATH_TO_DATA = '/Users/mengjie/Documents/Courses/SpringII/6450NLP/Awards_data/'
 df = loader.loadData(PATH_TO_DATA)
 
 df = preProcessing.htmlTagRemover(df)
