@@ -25,7 +25,6 @@ def processFile(file):
     df_text = preProcessing.tokenizer(df_text)
     df_text = preProcessing.stemAndLemma(df_text)
     df_text = preProcessing.stopwordsRemover(df_text)
-    df_text = preProcessing.extractVectorMatrix(df_text)
     
     df_num = preProcessing.nonPredictiveFeatureRemover(df_num)
     df_num = preProcessing.processDateFeatures(df_num)
