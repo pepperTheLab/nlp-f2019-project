@@ -15,7 +15,12 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 def getDirs():
     current = os.getcwd()
     addresses = {'raw': current + '/../data/raw/',
-                 'processed': current + '/../data/preprocessed/'}
+                 'processed': current + '/../data/preprocessed/',
+                 'mata': current + '/../data/meta/'}
+    
+    for folder in addresses.values():
+        if not os.path.exists(folder):
+            os.mkdir(folder)
     
     return addresses
 
