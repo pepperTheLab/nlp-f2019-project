@@ -6,6 +6,7 @@ Created on Sun Mar 24 10:59:50 2019
 @author: xinning.w
 """
 import os
+import pickle
 
 import loader
 import preProcessing
@@ -17,6 +18,7 @@ def processFile(file):
     
     df = loader.loadData(file)
     
+    df = preProcessing.targetToNum(df)
     df_text = df[['AwardedAmountToDate', 'Abstract']]
     df_num = df.drop('Abstract', axis=1)
     
@@ -30,10 +32,12 @@ def processFile(file):
     df_num = preProcessing.processDateFeatures(df_num)
     df_num = preProcessing.processCategoricalFeatures(df_num)
     
-    text_file_name = file_name + '_text.csv'
-    num_file_name = file_name + '_num.csv'
-    df_text.to_csv(addresses['processed'] + text_file_name, index=False)
-    df_num.to_csv(addresses['processed'] + num_file_name, index=False)
+    text_file_name = file_name + '_text.pkl'
+    num_file_name = file_name + '_num.pkl'
+    with open(addresses['processed'] + text_file_name, 'wb') as f:
+        pickle.dump(df_text, f)
+    with open(addresses['processed'] + num_file_name, 'wb') as f:
+        pickle.dump(df_num, f)
 
 def runPreprocessing():
     for file in os.listdir(addresses['raw']):

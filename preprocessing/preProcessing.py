@@ -15,6 +15,11 @@ import base
 # =============================================================================
 # Process Text Data
 # =============================================================================
+def targetToNum(df):
+    df['AwardedAmountToDate'] = df['AwardedAmountToDate'].apply(lambda x: base.targetToNum(x))
+    
+    return df
+
 def htmlTagRemover(df):
     df['Abstract'] = df['Abstract'].apply(lambda x: base.htmlTagRemover(x))
     

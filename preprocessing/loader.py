@@ -16,7 +16,9 @@ def getDirs():
     current = os.getcwd()
     addresses = {'raw': current + '/../data/raw/',
                  'processed': current + '/../data/preprocessed/',
-                 'mata': current + '/../data/meta/'}
+                 'meta': current + '/../data/meta/',
+                 'model': current + '/../data/models/',
+                 'performance': current + '/../data/performances/'}
     
     for folder in addresses.values():
         if not os.path.exists(folder):

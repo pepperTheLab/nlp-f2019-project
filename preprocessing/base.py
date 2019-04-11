@@ -26,6 +26,12 @@ def textWrapper(orig_func):
 def empty():
     return ''
 
+def targetToNum(text):
+    try:
+        return float(text[1:].replace(',', ''))
+    except:
+        return 0.0
+
 @textWrapper
 def htmlTagRemover(text):
     return re.sub(r'<.+>', '', text)
