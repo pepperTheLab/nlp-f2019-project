@@ -11,6 +11,7 @@ import pandas as pd
 from collections import Counter
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import train_test_split
+from sklearn.utils import shuffle
 
 def getDirs():
     current = os.getcwd()
@@ -42,6 +43,22 @@ def loadTextData():
             df.reset_index(inplace=True, drop=True)
             
     return df
+
+def downSampleMajor(df):
+    minor = df[df['AwardedAmountToDate']==1]
+    n_sample = minor.shape[0]
+    downsampled = df[df['AwardedAmountToDate']==0].sample(n=n_sample, random_state=1)
+    df = pd.concat([minor, downsampled])
+    
+    return shuffle(df)
+
+def upSampleMinor(df):
+    major = df[df['AwardedAmountToDate']==0]
+    n_sample = major.shape[0]
+    upsampled = df[df['AwardedAmountToDate']==1].sample(n=n_sample, random_state=1)
+    df = pd.concat([major, upsampled])
+    
+    return shuffle(df)
 
 def extractVocab(df):
     vocab = [word for t in df['Tokens'] for word in t]

@@ -45,7 +45,9 @@ def getModelPerformances(y_train, y_train_pred, y_test, y_test_pred):
 
 def trainModel(clf, df_splitted, param_grid):
     algorithm_name = str(clf).split('(')[0]
+    print(f'Start Training {algorithm_name}...')
     clf = findBestParam(clf, param_grid, df_splitted)
+    print('Best Parameters Found!')
     X_train, X_test, y_train, y_test = [x for x in list(df_splitted.values())]
     clf.fit(X_train, y_train)
     
@@ -53,7 +55,7 @@ def trainModel(clf, df_splitted, param_grid):
     y_test_pred = clf.predict(X_test)
     
     all_metrics = getModelPerformances(y_train, y_train_pred, y_test, y_test_pred)
-    
+    print(f'{algorithm_name} Completed!')
     with open(addresses['model'] + algorithm_name + '.pkl', 'wb') as f:
         pickle.dump(clf, f)
     with open(addresses['performance'] + algorithm_name + '.json', 'w') as f:
