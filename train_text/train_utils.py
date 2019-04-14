@@ -51,7 +51,7 @@ def extractVocab(df):
     
     return vocab
 
-def extractDosuments(df):
+def extractDocuments(df):
     documents = [' '.join(tokens) for tokens in df['Tokens']]
     
     return documents
@@ -59,7 +59,7 @@ def extractDosuments(df):
 def extractVectorMatrix(df):
     vocab = extractVocab(df)
     vectorizer = TfidfVectorizer(vocabulary=vocab)
-    matrix = vectorizer.fit_transform(extractDosuments(df)).todense()
+    matrix = vectorizer.fit_transform(extractDocuments(df)).todense()
     vectors = pd.DataFrame(matrix)
     vectors.columns = vocab
     df.reset_index(inplace=True, drop=True)

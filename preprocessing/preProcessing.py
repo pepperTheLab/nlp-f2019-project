@@ -12,11 +12,18 @@ import loader
 import base
 
 
+LABEL_THRESHOLD = 1000000
+
 # =============================================================================
 # Process Text Data
 # =============================================================================
 def targetToNum(df):
     df['AwardedAmountToDate'] = df['AwardedAmountToDate'].apply(lambda x: base.targetToNum(x))
+    
+    return df
+
+def createLabel(df):
+    df['AwardedAmountToDate'] = df['AwardedAmountToDate'] >= LABEL_THRESHOLD
     
     return df
 
@@ -80,8 +87,8 @@ def nonPredictiveFeatureRemover(df):
                                'PrincipalInvestigator', 'Organization', 'ProgramManager',
                                'Co-PIName(s)', 'PIEmailAddress', 'OrganizationStreet',
                                'OrganizationCity', 'OrganizationState', 'OrganizationZip',
-                               'OrganizationPhone', 'NSFDirectorate', 'ProgramElementCode(s)',
-                               'ProgramReferenceCode(s)', 'ARRAAmount']
+                               'OrganizationPhone', 'ProgramElementCode(s)', 'ProgramReferenceCode(s)',
+                               'ARRAAmount', 'State', 'NSFOrganization', 'AwardInstrument']
     df.drop(non_predictive_features, axis=1, inplace=True)
     
     return df
@@ -96,7 +103,7 @@ def processDateFeatures(df):
     return df
 
 def processCategoricalFeatures(df):
-    categorical_features = ['NSFOrganization', 'State', 'AwardInstrument']
+    categorical_features = ['NSFDirectorate']
     for cat in categorical_features:
         df_ohe = pd.get_dummies(df[cat], drop_first=True)
         df = pd.concat([df, df_ohe], axis=1)

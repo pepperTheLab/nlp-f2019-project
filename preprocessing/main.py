@@ -19,6 +19,7 @@ def processFile(file):
     df = loader.loadData(file)
     
     df = preProcessing.targetToNum(df)
+    df = preProcessing.createLabel(df)
     df_text = df[['AwardedAmountToDate', 'Abstract']]
     df_num = df.drop('Abstract', axis=1)
     

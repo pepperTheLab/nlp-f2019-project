@@ -8,102 +8,107 @@ Created on Thu Apr 11 11:56:28 2019
 import pickle
 import json
 from sklearn.model_selection import GridSearchCV
-from sklearn.linear_model import LinearRegression, Ridge, Lasso
-from sklearn.tree import DecisionTreeRegressor
-from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
-from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score 
+from sklearn.linear_model import LogisticRegression
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
+from sklearn.neighbors import KNeighborsClassifier
+#from sklearn.svm import SVC
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score 
 
 import train_utils
 
 addresses = train_utils.getDirs()
 
-def findBestParam(regressor, param_grid, df_splitted):  
+def findBestParam(clf, param_grid, df_splitted):  
     X_train, X_test, y_train, y_test = [x for x in list(df_splitted.values())]
     
-    grid_obj = GridSearchCV(regressor, param_grid, cv=5)
+    grid_obj = GridSearchCV(clf, param_grid, cv=5)
     grid_obj = grid_obj.fit(X_train, y_train)
     
-    regressor = grid_obj.best_estimator_
+    clf = grid_obj.best_estimator_
     
-    return regressor
+    return clf
 
 def getModelPerformances(y_train, y_train_pred, y_test, y_test_pred):
-    metric_names = ['MSE', 'MAE', 'R-Square']
-    metric_values_train = [mean_squared_error(y_train, y_train_pred),
-                           mean_absolute_error(y_train, y_train_pred),
-                           r2_score(y_train, y_train_pred)]
-    metric_values_test = [mean_squared_error(y_test, y_test_pred),
-                          mean_absolute_error(y_test, y_test_pred),
-                          r2_score(y_test, y_test_pred)]
+    metric_names = ['Accuracy', 'Precision', 'Recall', 'F1_Score']
+    metric_values_train = [accuracy_score(y_train, y_train_pred),
+                           precision_score(y_train, y_train_pred),
+                           recall_score(y_train, y_train_pred),
+                           f1_score(y_train, y_train_pred)]
+    metric_values_test = [accuracy_score(y_test, y_test_pred),
+                          precision_score(y_test, y_test_pred),
+                          recall_score(y_test, y_test_pred),
+                          f1_score(y_train, y_train_pred)]
     all_metrics = {name: {'train': train, 'test': test} for name, train, test in zip(metric_names, metric_values_train, metric_values_test)}
     
     return all_metrics
 
-def trainModel(regressor, df_splitted, param_grid):
-    algorithm_name = str(regressor).split('(')[0]
-    regressor = findBestParam(regressor, param_grid, df_splitted)
+def trainModel(clf, df_splitted, param_grid):
+    algorithm_name = str(clf).split('(')[0]
+    clf = findBestParam(clf, param_grid, df_splitted)
     X_train, X_test, y_train, y_test = [x for x in list(df_splitted.values())]
-    regressor.fit(X_train, y_train)
+    clf.fit(X_train, y_train)
     
-    y_train_pred = regressor.predict(X_train)
-    y_test_pred = regressor.predict(X_test)
+    y_train_pred = clf.predict(X_train)
+    y_test_pred = clf.predict(X_test)
     
     all_metrics = getModelPerformances(y_train, y_train_pred, y_test, y_test_pred)
     
     with open(addresses['model'] + algorithm_name + '.pkl', 'wb') as f:
-        pickle.dump(regressor, f)
+        pickle.dump(clf, f)
     with open(addresses['performance'] + algorithm_name + '.json', 'w') as f:
         json.dump(all_metrics, f)
 
-def trainLinearRegression(df_splitted):
-    regressor = LinearRegression()
-    param_grid = {'fit_intercept': [True, False],
-                  'normalize': [True, False],
+def trainLogisticRegression(df_splitted):
+    clf = LogisticRegression()
+    param_grid = {'penalty': ['l2'],
+                  'C': [0.01, 0.1, 1.0],
+                  'solver': ['newton-cg', 'lbfgs'],
+                  'multi_class': ['multinomial'],
                   'n_jobs': [-1]}
     
-    trainModel(regressor, df_splitted, param_grid)
-    
-def trainRidge(df_splitted):
-    regressor = Ridge()
-    param_grid = {'fit_intercept': [True, False],
-                  'normalize': [True, False],
-                  'alpha': [0.01, 0.1, 1.0],
-                  'random_state': [42]}
-    
-    trainModel(regressor, df_splitted, param_grid)
-    
-def trainLasso(df_splitted):
-    regressor = Lasso()
-    param_grid = {'fit_intercept': [True, False],
-                  'normalize': [True, False],
-                  'alpha': [0.01, 0.1, 1.0],
-                  'random_state': [42]}
-    
-    trainModel(regressor, df_splitted, param_grid)
+    trainModel(clf, df_splitted, param_grid)
     
 def trainDecisionTree(df_splitted):
-    regressor = DecisionTreeRegressor()
-    param_grid = {'criterion': ['mse', 'mae'],
-                  'min_samples_leaf': [3, 5, 10, 20, 50],
+    clf = DecisionTreeClassifier()
+    param_grid = {'min_samples_leaf': [3, 5, 10, 20, 30]}
+    
+    trainModel(clf, df_splitted, param_grid)
+    
+#def trainSVM(df_splitted):
+#    regressor = SVC()
+#    param_grid = {'fit_intercept': [True, False],
+#                  'normalize': [True, False],
+#                  'alpha': [0.01, 0.1, 1.0],
+#                  'random_state': [42]}
+#    
+#    trainModel(regressor, df_splitted, param_grid)
+    
+def trainRandomForrest(df_splitted):
+    clf = RandomForestClassifier()
+    param_grid = {'n_estimators': [50, 100, 150, 200], 
+                  'min_samples_leaf': [3, 5, 10, 20, 30],
+                  'oob_score': [True, False], 
+                  'n_jobs': [-1], 
                   'random_state': [42]}
     
-    trainModel(regressor, df_splitted, param_grid)
+    trainModel(clf, df_splitted, param_grid)
     
-def trainRandomForest(df_splitted):
-    regressor = RandomForestRegressor()
-    param_grid = {'n_estimators': [50, 100, 200],
-                  'min_samples_leaf': [3, 5, 10, 20, 50],
-                  'random_state': [42],
-                  'n_jobs': [-1]}
+def trainKNN(df_splitted):
+    clf = KNeighborsClassifier()
+    param_grid = {'n_neighbors': [3, 5, 10, 20], 
+                  'weights': ['uniform', 'distance']}
     
-    trainModel(regressor, df_splitted, param_grid)
+    trainModel(clf, df_splitted, param_grid)
     
 def trainGBDT(df_splitted):
-    regressor = GradientBoostingRegressor()
-    param_grid = {'n_estimators': [50, 100, 200],
+    clf = GradientBoostingClassifier()
+    param_grid = {'loss': ['deviance'],
+                  'learning_rate': [0.01, 0.1, 1.0],
+                  'n_estimators': [50, 100, 150, 200], 
                   'max_depth': [3, 5, 10],
                   'random_state': [42]}
     
-    trainModel(regressor, df_splitted, param_grid)
+    trainModel(clf, df_splitted, param_grid)
     
     

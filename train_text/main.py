@@ -11,11 +11,10 @@ def runPreparation():
 
 def runTraining():
     df_splitted = runPreparation()
-    train_models.trainLinearRegression(df_splitted)
-    train_models.trainRidge(df_splitted)
-    train_models.trainLasso(df_splitted)
+    train_models.trainLogisticRegression(df_splitted)
     train_models.trainDecisionTree(df_splitted)
-    train_models.trainRandomForest(df_splitted)
+    train_models.trainRandomForrest(df_splitted)
+    train_models.trainKNN(df_splitted)
     train_models.trainGBDT(df_splitted)
     
 if __name__ == '__main__':
