@@ -14,7 +14,6 @@ def runPreparation():
     df = train_utils.downSampleMajor(df)
 #    df = train_utils.upSampleMinor(df)
 #   df = train_utils.upSampleMinor(df)
-    df = train_utils.extractVectorMatrix(df)
     df_splitted = train_utils.trainTestSplit(df)
     
     return df_splitted
