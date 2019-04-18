@@ -13,7 +13,6 @@ def runPreparation():
     df = pd.concat([df_num, df_sim], axis=1, sort=False)
     df = train_utils.downSampleMajor(df)
 #    df = train_utils.upSampleMinor(df)
-#   df = train_utils.upSampleMinor(df)
     df_splitted = train_utils.trainTestSplit(df)
     
     return df_splitted
