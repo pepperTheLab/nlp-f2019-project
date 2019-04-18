@@ -7,8 +7,11 @@ Created on Thu Apr 11 10:55:45 2019
 """
 import os
 import pickle
+import numpy as np
 import pandas as pd
+from scipy import sparse
 from collections import Counter
+from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.model_selection import train_test_split
 from sklearn.utils import shuffle
@@ -32,6 +35,21 @@ addresses = getDirs()
 def loadTextData():
     csvs = [file for file in os.listdir(addresses['processed']) if file.split('.')[-1]=='pkl']
     text_files = [file for file in csvs if file.split('.')[0].split('_')[-1]=='text']
+    df = None
+    for file in text_files:
+        with open(addresses['processed']+file, 'rb') as f:
+            df_new = pickle.load(f)
+        if df is None:
+            df = df_new
+        else:
+            df = pd.concat([df, df_new])
+            df.reset_index(inplace=True, drop=True)
+            
+    return df
+
+def loadNumData():
+    csvs = [file for file in os.listdir(addresses['processed']) if file.split('.')[-1]=='pkl']
+    text_files = [file for file in csvs if file.split('.')[0].split('_')[-1]=='num']
     df = None
     for file in text_files:
         with open(addresses['processed']+file, 'rb') as f:
@@ -86,6 +104,34 @@ def extractVectorMatrix(df):
     
     return df
 
+def generateMedoids(df):
+    df1 = df[df['AwardedAmountToDate']==1].drop('AwardedAmountToDate', axis=1)
+    df0 = df[df['AwardedAmountToDate']==0].drop('AwardedAmountToDate', axis=1)
+    medoid1 = df1.median().values
+    medoid0 = df0.median().values
+    medoids = {1: medoid1,
+               0: medoid0}
+    
+    return medoids
+        
+def cosineSimilarity(medoid, a):
+    try:
+        compare = np.array([a.tolist(), medoid.tolist()])
+        compare_sparse = sparse.csr_matrix(compare)
+        similarity = cosine_similarity(compare_sparse)[0][1]
+    except:
+        return 0.0
+    
+    return similarity
+
+def computeSimilarities(df, medoids):
+    df_sim = pd.DataFrame(columns = ['similarity_0', 'similarity_1'])
+    for index, row in  enumerate(df.drop('AwardedAmountToDate', axis=1).iterrows()):
+        df_sim.loc[index, 'similarity_0'] = cosineSimilarity(medoids[0], row[1].values)
+        df_sim.loc[index, 'similarity_1'] = cosineSimilarity(medoids[1], row[1].values)
+    
+    return df_sim
+    
 def trainTestSplit(df):
     X = df.drop('AwardedAmountToDate', axis=1).values
     y = df['AwardedAmountToDate'].values
