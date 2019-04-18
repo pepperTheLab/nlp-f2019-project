@@ -12,12 +12,9 @@ def runPreparation():
     df_sim = train_utils.computeSimilarities(df_text, medoids)
     df = pd.concat([df_num, df_sim], axis=1, sort=False)
     df = train_utils.downSampleMajor(df)
-<<<<<<< HEAD:train/main.py
 #    df = train_utils.upSampleMinor(df)
-=======
 #   df = train_utils.upSampleMinor(df)
     df = train_utils.extractVectorMatrix(df)
->>>>>>> 8e678f46847df760f64fd4c0327620be898fc381:train_text/main.py
     df_splitted = train_utils.trainTestSplit(df)
     
     return df_splitted
