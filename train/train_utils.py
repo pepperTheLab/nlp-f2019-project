@@ -92,6 +92,7 @@ def extractDocuments(df):
     return documents
 
 def extractVectorMatrix(df):
+    print('Extracting Vector Matrix...')
     vocab = extractVocab(df)
     vectorizer = TfidfVectorizer(vocabulary=vocab)
     matrix = vectorizer.fit_transform(extractDocuments(df)).todense()
@@ -101,16 +102,19 @@ def extractVectorMatrix(df):
     vectors.reset_index(inplace=True, drop=True)
     df = pd.concat([df, vectors], axis=1)
     df.drop('Tokens', axis=1, inplace=True)
+    print('Vector Matrix Extraction Complete!')
     
     return df
 
 def generateMedoids(df):
+    print('Generating Medoids...')
     df1 = df[df['AwardedAmountToDate']==1].drop('AwardedAmountToDate', axis=1)
     df0 = df[df['AwardedAmountToDate']==0].drop('AwardedAmountToDate', axis=1)
     medoid1 = df1.median().values
     medoid0 = df0.median().values
     medoids = {1: medoid1,
                0: medoid0}
+    print('Medoids Generation Completed!')
     
     return medoids
         
@@ -125,10 +129,12 @@ def cosineSimilarity(medoid, a):
     return similarity
 
 def computeSimilarities(df, medoids):
+    print('Calculating Similarity Scores...')
     df_sim = pd.DataFrame(columns = ['similarity_0', 'similarity_1'])
     for index, row in  enumerate(df.drop('AwardedAmountToDate', axis=1).iterrows()):
         df_sim.loc[index, 'similarity_0'] = cosineSimilarity(medoids[0], row[1].values)
         df_sim.loc[index, 'similarity_1'] = cosineSimilarity(medoids[1], row[1].values)
+    print('Similarity Calculation Completed!')
     
     return df_sim
     
