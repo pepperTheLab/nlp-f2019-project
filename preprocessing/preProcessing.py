@@ -24,6 +24,7 @@ def targetToNum(df):
 
 def createLabel(df):
     df['AwardedAmountToDate'] = df['AwardedAmountToDate'] >= LABEL_THRESHOLD
+    df['AwardedAmountToDate'] = df['AwardedAmountToDate'].apply(lambda x: int(x)).astype('category')
     
     return df
 

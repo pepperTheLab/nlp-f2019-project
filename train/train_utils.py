@@ -20,6 +20,7 @@ def getDirs():
     current = os.getcwd()
     addresses = {'raw': current + '/../data/raw/',
                  'processed': current + '/../data/preprocessed/',
+                 'untagged': current + '/../data/untagged/',
                  'meta': current + '/../data/meta/',
                  'model': current + '/../data/models/',
                  'performance': current + '/../data/performances/'}
@@ -83,6 +84,8 @@ def extractVocab(df):
     vocab = [word for word in vocab if len(word)>1]
     counter = Counter(vocab)
     vocab = [word for word, count in counter.most_common(3000)]
+    with open(addresses['model'] + 'vocab.pkl', 'wb') as f:
+        pickle.dump(vocab, f)
     
     return vocab
 
@@ -114,6 +117,8 @@ def generateMedoids(df):
     medoid0 = df0.median().values
     medoids = {1: medoid1,
                0: medoid0}
+    with open(addresses['model'] + 'medoids.pkl', 'wb') as f:
+        pickle.dump(medoids, f)
     print('Medoids Generation Completed!')
     
     return medoids

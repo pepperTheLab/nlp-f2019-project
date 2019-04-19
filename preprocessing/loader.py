@@ -16,6 +16,7 @@ def getDirs():
     current = os.getcwd()
     addresses = {'raw': current + '/../data/raw/',
                  'processed': current + '/../data/preprocessed/',
+                 'untagged': current + '/../data/untagged/',
                  'meta': current + '/../data/meta/',
                  'model': current + '/../data/models/',
                  'performance': current + '/../data/performances/'}
