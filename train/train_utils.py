@@ -7,6 +7,7 @@ Created on Thu Apr 11 10:55:45 2019
 """
 import os
 import pickle
+import nltk
 import numpy as np
 import pandas as pd
 from scipy import sparse
@@ -48,6 +49,12 @@ def loadTextData():
             
     return df
 
+def convertNGrams(df):
+#    df['tweet_2gram'] = df['tweet'].apply(lambda x: [''.join([x, y]) for x, y in list(nltk.ngrams(x, 2))])
+    df['Tokens'] = df['Tokens'].apply(lambda x: [''.join([x, y]) for x, y in list(nltk.ngrams(x, 2))])
+    
+    return df
+
 def loadNumData():
     csvs = [file for file in os.listdir(addresses['processed']) if file.split('.')[-1]=='pkl']
     text_files = [file for file in csvs if file.split('.')[0].split('_')[-1]=='num']
@@ -83,7 +90,7 @@ def extractVocab(df):
     vocab = [word for t in df['Tokens'] for word in t]
     vocab = [word for word in vocab if len(word)>1]
     counter = Counter(vocab)
-    vocab = [word for word, count in counter.most_common(3000)]
+    vocab = [word for word, count in counter.most_common(5000)]
     with open(addresses['model'] + 'vocab.pkl', 'wb') as f:
         pickle.dump(vocab, f)
     
@@ -113,8 +120,8 @@ def generateMedoids(df):
     print('Generating Medoids...')
     df1 = df[df['AwardedAmountToDate']==1].drop('AwardedAmountToDate', axis=1)
     df0 = df[df['AwardedAmountToDate']==0].drop('AwardedAmountToDate', axis=1)
-    medoid1 = df1.median().values
-    medoid0 = df0.median().values
+    medoid1 = (df1.sum()/(df1.sum().sum())).values
+    medoid0 = (df0.sum()/(df0.sum().sum())).values
     medoids = {1: medoid1,
                0: medoid0}
     with open(addresses['model'] + 'medoids.pkl', 'wb') as f:
@@ -144,6 +151,7 @@ def computeSimilarities(df, medoids):
     return df_sim
     
 def trainTestSplit(df):
+    df['YearStart'] = df['YearStart'].astype('category')
     X = df.drop('AwardedAmountToDate', axis=1).values
     y = df['AwardedAmountToDate'].values
     X_train, X_test, y_train, y_test = train_test_split(X, y,

@@ -6,6 +6,7 @@ import pandas as pd
 
 def runPreparation():
     df_text = train_utils.loadTextData()
+    df_text = train_utils.convertNGrams(df_text)
     df_num = train_utils.loadNumData()
     df_text = train_utils.extractVectorMatrix(df_text)
     medoids = train_utils.generateMedoids(df_text)
